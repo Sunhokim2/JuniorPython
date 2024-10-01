@@ -1,16 +1,29 @@
-# This is a sample Python script.
+import requests
 
-# Press Ctrl+F5 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+#날씨API
+OWM_Endpoint = "https://api.openweathermap.org/data/3.0/onecall"
+#해당사이트에 회원가입을 하고 api key 발급을 받아야 가능합니다.
+api_key = ""
 
+weather_params = { #위치는 인천
+    "lat" : 37.424707,
+    "lon": 126.726769,
+    "appid": api_key,
+    "exclude": "current, minutely,daily"
+}
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press F9 to toggle the breakpoint.
+response = requests.get(OWM_Endpoint, params = weather_params)
+response.raise_for_status()
+weather_data = response.json()
+weather_slice = weather_data["hourly"][:12]
+#날씨id를 불러온다
 
+will_rain = False
+for hour_datra in weather_slice:
+    condition_code = hour_datra["weather"][0]["id"]
+    #id가 700보다 낮으면 우천,눈 등 하늘에서 뭐가 내리는것이다.
+    if int(condition_code) < 700:
+        will_rain = True
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if will_rain:
+    print("우산챙기세요")
